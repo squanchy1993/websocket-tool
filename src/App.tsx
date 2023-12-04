@@ -4,11 +4,11 @@
  * @LastEditTime: 2023-12-03 17:27:34
  * @FilePath: /websocket-tool/src/App.tsx
  */
-import * as React from 'react';
 import { useState } from "react";
 import styled from "styled-components";
-import CardItem from './component/CardItem'
-import WsConfig from './component/wsConfig';
+import CardItem from './component/CardItem';
+import WsConfig from './component/WsConfig';
+import WsStatus from './component/WsStatus';
 
 const Container = styled.div`
   width: 100vw;
@@ -57,6 +57,7 @@ function App() {
         <section className="body">
           <div className="body-inner">
             <div className="left">
+              <WsStatus />
               <WsConfig />
             </div>
             <div className="right">
