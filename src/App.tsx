@@ -1,16 +1,19 @@
 /*
  * @Date: 2023-12-03 12:31:31
  * @LastEditors: zhusisheng zhusisheng@shenhaoinfo.com
- * @LastEditTime: 2023-12-05 10:12:23
+ * @LastEditTime: 2023-12-05 15:39:30
  * @FilePath: \websocket-tool\src\App.tsx
  */
 import { useState } from "react";
 import styled from "styled-components";
-import CardItem from './component/CardItem';
 import WsConfig from './component/WsConfig';
 import WsStatus from './component/WsStatus';
 import IntervalSend from './component/IntervalSend'
-import TemporarySend from './component/temporarySend'
+import TemporarySend from './component/TemporarySend'
+import ConsoleLog from './component/ConsoleLog'
+import MessageRecords from './component/MessageRecords'
+import './App.css'
+
 
 const Container = styled.div`
   width: 100vw;
@@ -63,9 +66,10 @@ function App() {
               <WsConfig />
               <IntervalSend />
               <TemporarySend />
+              <ConsoleLog />
             </div>
             <div className="right">
-              <CardItem title="发包设置" />
+              <MessageRecords />
             </div>
           </div>
         </section>
