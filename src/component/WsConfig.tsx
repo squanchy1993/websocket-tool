@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-12-03 12:31:31
- * @LastEditors: 朱志森 826482354@qq.com
- * @LastEditTime: 2023-12-03 18:08:12
- * @FilePath: /websocket-tool/src/component/wsConfig.tsx
+ * @LastEditors: zhusisheng zhusisheng@shenhaoinfo.com
+ * @LastEditTime: 2023-12-04 18:55:33
+ * @FilePath: \websocket-tool\src\component\WsConfig.tsx
  */
 import styled from "styled-components";
 import React from "react";
@@ -12,7 +12,7 @@ import { Input } from "@mui/material";
 
 const Container = styled.div`
   width: 100%;
-  height: 300px;
+  height: 100px;
   .input-group{
     display: flex;
     height: 36px;

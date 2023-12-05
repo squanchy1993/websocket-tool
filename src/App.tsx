@@ -1,14 +1,16 @@
 /*
  * @Date: 2023-12-03 12:31:31
- * @LastEditors: 朱志森 826482354@qq.com
- * @LastEditTime: 2023-12-03 17:27:34
- * @FilePath: /websocket-tool/src/App.tsx
+ * @LastEditors: zhusisheng zhusisheng@shenhaoinfo.com
+ * @LastEditTime: 2023-12-05 10:12:23
+ * @FilePath: \websocket-tool\src\App.tsx
  */
 import { useState } from "react";
 import styled from "styled-components";
 import CardItem from './component/CardItem';
 import WsConfig from './component/WsConfig';
 import WsStatus from './component/WsStatus';
+import IntervalSend from './component/IntervalSend'
+import TemporarySend from './component/temporarySend'
 
 const Container = styled.div`
   width: 100vw;
@@ -59,6 +61,8 @@ function App() {
             <div className="left">
               <WsStatus />
               <WsConfig />
+              <IntervalSend />
+              <TemporarySend />
             </div>
             <div className="right">
               <CardItem title="发包设置" />
