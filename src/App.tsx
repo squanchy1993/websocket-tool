@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-12-03 12:31:31
- * @LastEditors: zhusisheng zhusisheng@shenhaoinfo.com
- * @LastEditTime: 2023-12-06 18:49:34
- * @FilePath: \websocket-tool\src\App.tsx
+ * @LastEditors: squanchy1993@yeah.net squanchy@yeah.net
+ * @LastEditTime: 2023-12-06 20:40:29
+ * @FilePath: /websocket-tool/src/App.tsx
  */
 import { useState } from "react";
 import styled from "styled-components";
@@ -14,6 +14,7 @@ import ConsoleLog from './component/ConsoleLog'
 import MessageRecords from './component/MessageRecords'
 import './App.css'
 import { Socket } from "./component/socket";
+import { Button } from "@mui/material";
 
 
 const Container = styled.div`
@@ -52,8 +53,8 @@ const Container = styled.div`
     }
   }
 `;
-const socket = new Socket({heartBeatConfig: {handleHeartBeatMsg:(msg)=> {console.log('msg>>>', msg); return true;}}})
-socket.connect('ws://124.222.224.186:8800')
+const socket = new Socket({ heartBeatConfig: { handleHeartBeatMsg: (msg) => msg.data.includes('heartbeat') } })
+// socket.connect('ws://124.222.224.186:8800')
 function App() {
   const [count, setCount] = useState(0);
   return (
@@ -63,6 +64,7 @@ function App() {
         <section className="body">
           <div className="body-inner">
             <div className="left">
+              <Button onClick={() => socket.connect('ws://124.222.224.186:8800')}>链接</Button>
               <WsStatus />
               <WsConfig />
               <IntervalSend />

@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /*
  * @Date: 2023-12-05 16:23:53
- * @LastEditors: zhusisheng zhusisheng@shenhaoinfo.com
- * @LastEditTime: 2023-12-06 19:03:28
- * @FilePath: \websocket-tool\src\component\socket.ts
+ * @LastEditors: squanchy1993@yeah.net squanchy@yeah.net
+ * @LastEditTime: 2023-12-06 21:37:01
+ * @FilePath: /websocket-tool/src/component/socket.ts
  */
 enum SocketStatus {
   closed = "closed",
@@ -83,7 +83,7 @@ export class Socket {
 
     // onopen
     this.wsInstance.onopen = (ev) => {
-      console.warn('onopen>>>', this.connectStatus, ev)
+      console.info('onopen>>>', this.connectStatus, ev)
       if (this.connectStatus == SocketStatus.connecting) {
         this.connectStatus = SocketStatus.connected;
         this.connectingCb?.resovle?.({ success: true, message: '连接成功' });
@@ -96,7 +96,7 @@ export class Socket {
 
     // onclose
     this.wsInstance.onclose = (ev) => {
-      console.warn('onclose>>>', this.connectStatus, ev)
+      console.info('onclose>>>', this.connectStatus, ev)
       if (this.connectStatus == SocketStatus.closing) {
         this.connectStatus = SocketStatus.closed;
         this.closingCb?.resovle?.({ success: true, message: `关闭成功 :${ev}` });
@@ -107,7 +107,7 @@ export class Socket {
 
     // onerror
     this.wsInstance.onerror = (ev) => {
-      console.warn('onerror>>>', this.connectStatus, ev)
+      console.info('onerror>>>', this.connectStatus, ev)
       if (this.connectStatus == SocketStatus.connecting) {
         this.connectStatus = SocketStatus.closed;
         this.connectingCb?.reject?.({ success: false, message: `开启失败 onerror:${ev}` });
@@ -123,7 +123,7 @@ export class Socket {
 
     // onmessage
     this.wsInstance.onmessage = (ev) => {
-      console.warn('onmessage>>>', this.connectStatus, ev)
+      console.info('onmessage>>>', this.connectStatus, ev)
       this._heartBeat.received(ev);
 
       if (this.pause) {
@@ -153,20 +153,25 @@ export class Socket {
     let timeoutTimer: null | number = null;
     const send = () => {
       this.wsInstance?.send(this.heartBeat.sendMsg);
-      timeoutTimer && clearTimeout(timeoutTimer);
       timeoutTimer = setTimeout(async () => {
-        await this.close();
-        await this.connect(this.address, this.connectTimeout);
+        console.log('heartbeat timeout')
+        this.constantlyReconnect.start();
       }, this.heartBeat.timeout)
     };
 
 
     let sendTimer: null | number = null;
     const received = (msg: any) => {
+
+      // check is HeartBeatMsg
       const isHeartBeatMsg = this.heartBeat.handleHeartBeatMsg(msg);
-      if (!isHeartBeatMsg || sendTimer) return;
+      if (!isHeartBeatMsg) return;
+
+      // clear send timeout timers;
+      timeoutTimer && clearTimeout(timeoutTimer);
+
+      if (sendTimer) return;
       sendTimer = setTimeout(() => {
-        console.log('发送 心跳')
         send()
         sendTimer && clearTimeout(sendTimer);
         sendTimer = null;
@@ -178,8 +183,41 @@ export class Socket {
     }
   })();
 
+  constantlyReconnect = (
+    () => {
+      let sendTimer: null | number = null;
+      const start = () => {
+        if (sendTimer) {
+          return;
+        }
+        sendTimer = setTimeout(async () => {
+          try {
+            await this._close();
+            await this.connect(this.address, this.connectTimeout);
+            if (this.connectStatus == SocketStatus.connected) {
+              stop();
+            }
+          } catch (error) {
+            console.log('继续重试', error)
+            stop();
+            start();
+          }
+        }, 5000)
+      }
+      const stop = () => {
+        sendTimer && clearTimeout(sendTimer);
+        sendTimer = null
+      }
+      return {
+        start,
+        stop
+      }
 
-  async connect(address: string, connectTimeout: number = 20000): Promise<void> {
+    }
+  )();
+
+
+  async connect(address: string, connectTimeout: number = 20000): Promise<object> {
     return new Promise((resovle, reject) => {
       if (this.connectStatus !== SocketStatus.closed) {
         return reject({ success: false, message: `eval connect failed: ${this.connectStatus}` })
@@ -204,9 +242,9 @@ export class Socket {
     })
   }
 
-  async close(): Promise<void> {
+  async _close(): Promise<object> {
     return new Promise((resovle, reject) => {
-      if (this.connectStatus !== SocketStatus.connected) {
+      if (this.connectStatus !== SocketStatus.connected && this.connectStatus !== SocketStatus.closed ) {
         return reject({ success: false, message: `eval close() failed: ${this.connectStatus}` })
       }
       this.closingCb.resovle = resovle;
@@ -219,9 +257,16 @@ export class Socket {
       // connecting out of time;
       this.closingTimer = setTimeout(() => {
         this.connectStatus = SocketStatus.closed;
-        reject({ success: false, message: '关闭超时,强行关闭' });
+        resovle({ success: false, message: '关闭超时,强行关闭' });
         this._clearClose()
       }, 2000);
     })
   }
+
+  async closeConnect() {
+    this.constantlyReconnect.stop();
+    return this._close();
+  }
+
+  async throwErrorCode(){}
 }
