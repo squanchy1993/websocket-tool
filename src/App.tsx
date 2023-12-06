@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-03 12:31:31
  * @LastEditors: zhusisheng zhusisheng@shenhaoinfo.com
- * @LastEditTime: 2023-12-05 18:21:28
+ * @LastEditTime: 2023-12-06 18:49:34
  * @FilePath: \websocket-tool\src\App.tsx
  */
 import { useState } from "react";
@@ -52,8 +52,8 @@ const Container = styled.div`
     }
   }
 `;
-// const socket = new Socket()
-// socket.connect('ws://124.222.224.181:8800')
+const socket = new Socket({heartBeatConfig: {handleHeartBeatMsg:(msg)=> {console.log('msg>>>', msg); return true;}}})
+socket.connect('ws://124.222.224.186:8800')
 function App() {
   const [count, setCount] = useState(0);
   return (
