@@ -51,12 +51,7 @@ export class Socket {
     // onclose
     this.wsInstance.onclose = (ev) => {
       console.warn('onclose>>>', this.connectStatus, ev)
-      if (this.connectStatus == SocketStatus.connecting) {
-        this.connectStatus = SocketStatus.closed;
-        this.connectingCb?.reject?.({ success: false, message: `开启失败 :${ev}` });
-
-        this._clearConnect();
-      } else if (this.connectStatus == SocketStatus.closing) {
+      if (this.connectStatus == SocketStatus.closing) {
         this.connectStatus = SocketStatus.closed;
         this.closingCb?.resovle?.({ success: true, message: `关闭成功 :${ev}` });
 
